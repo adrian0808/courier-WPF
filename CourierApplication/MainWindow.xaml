@@ -1,0 +1,104 @@
+﻿<Window x:Class="CourierApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CourierApplication"
+        mc:Ignorable="d"
+        Title="CourierApp" Height="450" Width="800">
+
+    <Border Padding="10" Background="GhostWhite">
+        <StackPanel>
+            <GroupBox>
+                <TextBlock Text="Application for optimizing transport costs in a courier company" TextAlignment="Center" FontSize="20" FontWeight="Bold"></TextBlock>
+            </GroupBox>
+            <TabControl Margin="0 10 0 0">
+                <TabItem Header="Parameters">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Simulated Annealing parameters:" FontSize="14" Margin="0 10 0 0" Padding="10"></TextBlock>
+                            <TextBlock Grid.Column="1" Text="Load input data:" FontSize="14" Margin="0 10 0 0" Padding="10"></TextBlock>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Padding="5" Grid.Column="0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Initial temperature: " Margin="0 10 0 0"></TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Cooling temperature: " Margin="0 10 0 0"></TextBlock>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Lambda: " Margin="0 10 0 0"></TextBlock>
+
+                                    <TextBox Grid.Row="0" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Padding="5" Grid.Column="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Numbers of couriers: " Margin="0 15 0 0"></TextBlock>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Numbers of orders: " Margin="0 15 0 0"></TextBlock>
+
+                                    <TextBox Grid.Row="0" Grid.Column="1" Padding="5" Margin="0 10 0 10"></TextBox>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Padding="5" Margin="0 10 0 10"></TextBox>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                        <StackPanel>
+                            <Button x:Name="StartButton" Click="StartButton_Click" Content="Start" Width="80" Height="30" Margin="0 10 0 10" Padding="5" HorizontalAlignment="Center">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="5"></Setter>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Results">
+                    <StackPanel>
+                        <TextBox x:Name="ResultTextBox" AcceptsReturn="True" TextWrapping="Wrap" IsEnabled="False" Width="300" Height="300" Margin="0 20 0 0"/>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Couriers">
+
+                </TabItem>
+                <TabItem Header="Clients">
+
+                </TabItem>
+                <TabItem Header="Orders">
+
+                </TabItem>
+                <TabItem Header="Distances">
+
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </Border>
+</Window>
+    
+
+    
