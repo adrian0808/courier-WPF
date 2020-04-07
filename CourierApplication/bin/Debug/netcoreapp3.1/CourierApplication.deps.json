@@ -13,7 +13,9 @@
           "Microsoft.EntityFrameworkCore.Design": "3.1.2",
           "Microsoft.EntityFrameworkCore.SqlServer": "3.1.2",
           "Microsoft.EntityFrameworkCore.Tools": "3.1.2",
-          "NEST": "7.6.1"
+          "NEST": "7.6.1",
+          "System.Windows.Controls.DataVisualization.Toolkit": "3.5.40128.1",
+          "WPFToolkit": "3.5.40128.1"
         },
         "runtime": {
           "CourierApplication.dll": {}
@@ -962,6 +964,22 @@
           "System.Xml.ReaderWriter": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
         }
+      },
+      "System.Windows.Controls.DataVisualization.Toolkit/3.5.40128.1": {
+        "runtime": {
+          "System.Windows.Controls.DataVisualization.Toolkit.dll": {
+            "assemblyVersion": "3.5.40128.1",
+            "fileVersion": "3.5.40619.1"
+          }
+        }
+      },
+      "WPFToolkit/3.5.40128.1": {
+        "runtime": {
+          "WPFToolkit.dll": {
+            "assemblyVersion": "3.5.40128.1",
+            "fileVersion": "3.5.40320.1"
+          }
+        }
       }
     }
   },
@@ -1663,6 +1681,16 @@
       "sha512": "sha512-MYoTCP7EZ98RrANESW05J5ZwskKDoN0AuZ06ZflnowE50LTpbR5yRg3tHckTVm5j/m47stuGgCrCHWePyHS70Q==",
       "path": "system.xml.xmlserializer/4.3.0",
       "hashPath": "system.xml.xmlserializer.4.3.0.nupkg.sha512"
+    },
+    "System.Windows.Controls.DataVisualization.Toolkit/3.5.40128.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WPFToolkit/3.5.40128.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

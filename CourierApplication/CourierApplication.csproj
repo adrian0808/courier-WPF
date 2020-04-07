@@ -21,4 +21,17 @@
     <PackageReference Include="NEST" Version="7.6.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Controls.DataVisualization.Toolkit">
+      <HintPath>..\..\Generator Liczb Losowych\Generator Liczb Losowych\bin\Debug\System.Windows.Controls.DataVisualization.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="WPFToolkit">
+      <HintPath>..\..\Generator Liczb Losowych\Generator Liczb Losowych\bin\Debug\WPFToolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

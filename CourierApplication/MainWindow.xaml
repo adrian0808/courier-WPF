@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourierApplication"
+        xmlns:DV="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"  
+        xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"  
         mc:Ignorable="d"
-        Title="CourierApp" Height="450" Width="800">
+        Title="CourierApp" Height="600" Width="850">
 
     <Border Padding="10" Background="GhostWhite">
         <StackPanel>
@@ -44,9 +46,9 @@
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Cooling temperature: " Margin="0 10 0 0"></TextBlock>
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Lambda: " Margin="0 10 0 0"></TextBlock>
 
-                                    <TextBox Grid.Row="0" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
-                                    <TextBox Grid.Row="2" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
+                                    <TextBox x:Name="InitTemp" Grid.Row="0" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
+                                    <TextBox x:Name="CoolingTemp" Grid.Row="1" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
+                                    <TextBox x:Name="Lambda" Grid.Row="2" Grid.Column="1" Padding="5" Margin="0 5 0 0"></TextBox>
                                 </Grid>
                             </GroupBox>
                             <GroupBox Padding="5" Grid.Column="1">
@@ -62,8 +64,8 @@
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Numbers of couriers: " Margin="0 15 0 0"></TextBlock>
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Numbers of orders: " Margin="0 15 0 0"></TextBlock>
 
-                                    <TextBox Grid.Row="0" Grid.Column="1" Padding="5" Margin="0 10 0 10"></TextBox>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Padding="5" Margin="0 10 0 10"></TextBox>
+                                    <TextBox x:Name="numCouriers" Grid.Row="0" Grid.Column="1" Padding="5" Margin="0 10 0 10"></TextBox>
+                                    <TextBox x:Name="numOrders" Grid.Row="1" Grid.Column="1" Padding="5" Margin="0 10 0 10"></TextBox>
                                 </Grid>
                             </GroupBox>
                         </Grid>
@@ -80,19 +82,242 @@
                 </TabItem>
                 <TabItem Header="Results">
                     <StackPanel>
-                        <TextBox x:Name="ResultTextBox" AcceptsReturn="True" TextWrapping="Wrap" IsEnabled="False" Width="300" Height="300" Margin="0 20 0 0"/>
+                        <TextBox x:Name="ResultTextBox" AcceptsReturn="True" TextWrapping="Wrap" IsEnabled="False" Width="700" Height="300" Margin="0 20 0 20" FontSize="18" FontWeight="Bold"/>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Graphs">
+
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
+                            <Button Content="Graph1" Width="100" Height="30" VerticalAlignment="Center" Margin="0 0 20 0" Click="Button_Click1"></Button>
+                            <Button Content="Graph2" Width="100" Height="30" VerticalAlignment="Center" Click="Button_Click2"></Button>
+                        </StackPanel>
+                        <Frame x:Name="MainGraph" Margin="0 15 0 15" NavigationUIVisibility="Hidden"/>
                     </StackPanel>
                 </TabItem>
                 <TabItem Header="Couriers">
+                    <StackPanel>
+                        <Button x:Name="LoadCourierButton" Width="100" Height="25" Click="LoadCourierButton_Click" Content="Load Couriers" Margin="0 10 0 10" HorizontalAlignment="Left"></Button>
+                        <StackPanel>
+                            <DataGrid x:Name="courierGrid" ItemsSource="{Binding Courier}" AutoGenerateColumns="False" CanUserAddRows="False" IsSynchronizedWithCurrentItem="true" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Courier ID" Binding="{Binding CourierId}" Width="80" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Firstname" Binding="{Binding FirstName}" Width="120" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Lastname" Binding="{Binding LastName}" Width="120" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridCheckBoxColumn x:Name="courierCheckbox" Header="IsFree" Binding="{Binding isFree}" Width="60" CanUserSort="True" ></DataGridCheckBoxColumn>
 
+                                    <DataGridTemplateColumn Header="Update">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="UpdateCourierButton">Update</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Delete">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="DeleteCourierButton">Delete</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </StackPanel>
                 </TabItem>
                 <TabItem Header="Clients">
+                    <StackPanel>
+                        <Button x:Name="LoadClientButton" Width="100" Height="25" Click="LoadClientButton_Click" Content="Load Clients" Margin="0 10 0 10" HorizontalAlignment="Left"></Button>
+                        <StackPanel>
+                            <DataGrid  x:Name="clientGrid" ItemsSource="{Binding Client}" AutoGenerateColumns="False" CanUserAddRows="False" IsSynchronizedWithCurrentItem="true" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Client ID" Binding="{Binding ClientId}" Width="80" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Adress ID" Binding="{Binding AdressId}" Width="80" CanUserSort="True"></DataGridTextColumn>
 
+                                    <DataGridTemplateColumn Header="Update">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="UpdateClientButton">Update</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Delete">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="DeleteClientButton">Delete</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </StackPanel>
                 </TabItem>
                 <TabItem Header="Orders">
+                    <StackPanel>
+                        <Button x:Name="LoadOrderButton" Width="100" Height="25" Click="LoadOrderButton_Click" Content="Load Orders" Margin="0 10 0 10" HorizontalAlignment="Left"></Button>
+                        <StackPanel>
+                            <DataGrid  x:Name="orderGrid" ItemsSource="{Binding Order}" AutoGenerateColumns="False" CanUserAddRows="False" IsSynchronizedWithCurrentItem="true" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Order ID" Binding="{Binding OrderId}" Width="80" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Adress ID" Binding="{Binding AdressId}" Width="80" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridCheckBoxColumn x:Name="orderCheckbox" Header="IsCompleted" Binding="{Binding isCompleted}" Width="90" CanUserSort="True" ></DataGridCheckBoxColumn>
+                                    <DataGridTemplateColumn Header="Update">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="UpdateOrderButton">Update</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
 
+                                    <DataGridTemplateColumn Header="Delete">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="DeleteOrderButton">Delete</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </StackPanel>
                 </TabItem>
-                <TabItem Header="Distances">
+                <TabItem Header="Adresses">
+                    <StackPanel>
+                        <Button x:Name="LoadAdressButton" Width="100" Height="25" Click="LoadAdressButton_Click" Content="Load Adresses" Margin="0 10 0 10" HorizontalAlignment="Left"></Button>
+                        <StackPanel>
+                            <DataGrid  x:Name="adressGrid" ItemsSource="{Binding Adresses}" AutoGenerateColumns="False" CanUserAddRows="False" IsSynchronizedWithCurrentItem="true" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Adress ID" Binding="{Binding AdressId}" Width="80" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="180" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Latitude" Binding="{Binding Latitude}" Width="150" CanUserSort="True"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Longitude" Binding="{Binding Longitude}" Width="150" CanUserSort="True"></DataGridTextColumn>
+
+                                    <DataGridTemplateColumn Header="Update">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="UpdateAdressButton">Update</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Delete">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="DeleteAdressButton">Delete</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Adding">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Grid.Row="0" Grid.Column="0" Padding="5" Margin="0 10 0 0">
+                            <StackPanel>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Add Courier " FontSize="18" Margin="0 0 0 15"></TextBlock>
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Firstname: " FontSize="14" Margin="0 0 0 5"></TextBlock>
+                                        <TextBox x:Name="FirstNameCourier" Grid.Column="1" Grid.Row="0" IsEnabled="true" Padding="2" Margin="0 0 0 5"></TextBox>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Lastname: " FontSize="14" Margin="0 0 0 5"></TextBlock>
+                                        <TextBox x:Name="LastNameCourier" Grid.Column="1" Grid.Row="1" IsEnabled="true" Padding="2" Margin="0 0 0 5"></TextBox>
+                                    </Grid>
+                                    <Button x:Name="AddCourierButton" Width="100" Height="25" Click="AddCourierButton_Click" Content="Add Courier" Margin="0 45 0 10" HorizontalAlignment="Center"></Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+
+                        <GroupBox Grid.Row="1" Grid.Column="1" Padding="5" Margin="0 10 0 0">
+                            <StackPanel>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text="Add Client" FontSize="18" Margin="0 0 0 15"></TextBlock>
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Adress ID: " FontSize="14" Margin="0 0 0 5"></TextBlock>
+                                        <TextBox x:Name="AdressIdClient" Grid.Column="1" IsEnabled="true" Padding="2" Margin="0 0 0 5"></TextBox>
+
+                                    </Grid>
+                                    <Button x:Name="AddClientButton" Width="100" Height="25" Click="AddClientButton_Click" Content="Add Client" Margin="0 30 0 10" HorizontalAlignment="Center"></Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Grid.Row="1" Grid.Column="0" Padding="5" Margin="0 10 0 0">
+                            <StackPanel>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text="Add Order" FontSize="18" Margin="0 0 0 15"></TextBlock>
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Adress ID: " FontSize="14" Margin="0 0 0 5"></TextBlock>
+                                        <TextBox x:Name="AdressIdOrder" Grid.Column="1" IsEnabled="true" Padding="2" Margin="0 0 0 5"></TextBox>
+
+                                    </Grid>
+                                    <Button x:Name="AddOrderButton" Width="100" Height="25" Click="AddOrderButton_Click" Content="Add Order" Margin="0 30 0 10" HorizontalAlignment="Center"></Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Grid.Row="0" Grid.Column="1" Padding="5" Margin="0 10 0 0">
+                            <StackPanel>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text="Add Adress" FontSize="18" Margin="0 0 0 15"></TextBlock>
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Name: " FontSize="14" Margin="0 0 0 5"></TextBlock>
+                                        <TextBox x:Name="NameAdress" Grid.Column="1" Grid.Row="0" IsEnabled="true" Padding="2" Margin="0 0 0 5"></TextBox>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Latitude: " FontSize="14" Margin="0 0 0 5"></TextBlock>
+                                        <TextBox x:Name="LatitudeAdress" Grid.Column="1" Grid.Row="1" IsEnabled="true" Padding="2" Margin="0 0 0 5"></TextBox>
+                                        <TextBlock  Grid.Column="0" Grid.Row="2" Text="Longitude: " FontSize="14" Margin="0 0 0 5"></TextBlock>
+                                        <TextBox x:Name="LongitudeAdress" Grid.Column="1" Grid.Row="2" IsEnabled="true" Padding="2" Margin="0 0 0 5"></TextBox>
+                                    </Grid>
+                                    <Button x:Name="AddAdressButton" Width="100" Height="25" Click="AddAdressButton_Click" Content="Add Adress" Margin="0 20 0 10" HorizontalAlignment="Center"></Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                    </Grid>
 
                 </TabItem>
             </TabControl>

@@ -5457,11 +5457,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Adrian\\Desktop\\C#\\Projekty\\CourierApplication\\CourierApplication\\CourierApplication.csproj",
+      "projectUniqueName": "C:\\Users\\Adrian\\Desktop\\C#\\Projekty\\CourierApplicationKopia\\CourierApplication\\CourierApplication.csproj",
       "projectName": "CourierApplication",
-      "projectPath": "C:\\Users\\Adrian\\Desktop\\C#\\Projekty\\CourierApplication\\CourierApplication\\CourierApplication.csproj",
+      "projectPath": "C:\\Users\\Adrian\\Desktop\\C#\\Projekty\\CourierApplicationKopia\\CourierApplication\\CourierApplication.csproj",
       "packagesPath": "C:\\Users\\Adrian\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Adrian\\Desktop\\C#\\Projekty\\CourierApplication\\CourierApplication\\obj\\",
+      "outputPath": "C:\\Users\\Adrian\\Desktop\\C#\\Projekty\\CourierApplicationKopia\\CourierApplication\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

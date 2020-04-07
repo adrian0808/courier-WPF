@@ -94,6 +94,31 @@ namespace CourierApplication.DAL
                 {
                     ClientId = 12,
                     AdressId = 12
+                },
+                new Client
+                {
+                    ClientId = 13,
+                    AdressId = 13
+                },
+                new Client
+                {
+                    ClientId = 14,
+                    AdressId = 14
+                },
+                new Client
+                {
+                    ClientId = 15,
+                    AdressId = 15
+                },
+                new Client
+                {
+                    ClientId = 16,
+                    AdressId = 16
+                },
+                new Client
+                {
+                    ClientId = 17,
+                    AdressId = 17
                 }
             );
 
@@ -125,7 +150,7 @@ namespace CourierApplication.DAL
                new Order
                {
                    OrderId = 5,
-                   AdressId = 9,
+                   AdressId = 14,
                    isCompleted = false
                },
                new Order
@@ -137,13 +162,13 @@ namespace CourierApplication.DAL
                new Order
                {
                    OrderId = 7,
-                   AdressId = 10,
+                   AdressId = 4,
                    isCompleted = false
                },
                new Order
                {
                    OrderId = 8,
-                   AdressId = 3,
+                   AdressId = 15,
                    isCompleted = false
                },
                new Order
@@ -155,7 +180,7 @@ namespace CourierApplication.DAL
                new Order
                {
                    OrderId = 10,
-                   AdressId = 4,
+                   AdressId = 7,
                    isCompleted = false
                },
                new Order
@@ -173,19 +198,49 @@ namespace CourierApplication.DAL
                new Order
                {
                    OrderId = 13,
-                   AdressId = 7,
-                   isCompleted = false
-               },
-               new Order
-               {
-                   OrderId = 14,
                    AdressId = 3,
                    isCompleted = false
                },
                new Order
                {
+                   OrderId = 14,
+                   AdressId = 17,
+                   isCompleted = false
+               },
+               new Order
+               {
                    OrderId = 15,
-                   AdressId = 5,
+                   AdressId = 13,
+                   isCompleted = false
+               },
+               new Order
+               {
+                    OrderId = 16,
+                    AdressId = 9,
+                    isCompleted = false
+               },
+               new Order
+               {
+                   OrderId = 17,
+                   AdressId = 16,
+                   isCompleted = false
+               },
+               new Order
+               {
+                   OrderId = 18,
+                   AdressId = 4,
+                   isCompleted = false
+               },
+               new Order
+               {
+                   OrderId = 19,
+                   AdressId = 11,
+                   isCompleted = false
+               },
+               new Order
+               {
+                   OrderId = 20,
+                   AdressId = 8,
                    isCompleted = false
                }
            );
@@ -211,7 +266,7 @@ namespace CourierApplication.DAL
                   AdressId = 3,
                   Name = "Legnicka 42/18",
                   Latitude = 51.114899M,
-                  Longitude = 17.001978M,         
+                  Longitude = 17.001978M,
               },
               new Adress //4
               {
@@ -225,57 +280,93 @@ namespace CourierApplication.DAL
                   AdressId = 5,
                   Name = "Rakietowa 20/9",
                   Latitude = 51.098380M,
-                  Longitude = 16.936670M,         
+                  Longitude = 16.936670M,
               },
               new Adress //6
               {
                   AdressId = 6,
                   Name = "Targowa 87/11",
                   Latitude = 51.065627M,
-                  Longitude = 16.957833M,   
+                  Longitude = 16.957833M,
               },
               new Adress //7
               {
                   AdressId = 7,
                   Name = "Bystrzycka 64/3",
                   Latitude = 51.119083M,
-                  Longitude = 16.978771M,                                   
+                  Longitude = 16.978771M,
               },
               new Adress //8
               {
                   AdressId = 8,
                   Name = "Bajana 82/16",
                   Latitude = 51.124014M,
-                  Longitude = 16.960451M,            
+                  Longitude = 16.960451M,
               },
               new Adress //9
               {
                   AdressId = 9,
                   Name = "Terenowa 8/2",
                   Latitude = 51.069190M,
-                  Longitude = 17.040798M,         
+                  Longitude = 17.040798M,
               },
               new Adress //10
               {
                   AdressId = 10,
                   Name = "Kolista 32/5",
                   Latitude = 51.135035M,
-                  Longitude = 16.973569M,    
+                  Longitude = 16.973569M,
               },
               new Adress //11
               {
                   AdressId = 11,
                   Name = "Pretficza 27/19",
                   Latitude = 51.091435M,
-                  Longitude = 17.008427M,      
+                  Longitude = 17.008427M,
               },
               new Adress
               {
                   AdressId = 12,
                   Name = "Drzewieckiego 24/29",
                   Latitude = 51.1259106M,
-                  Longitude = 16.9693086M,    
+                  Longitude = 16.9693086M,
+              },
+              new Adress
+              {
+                  AdressId = 13,
+                  Name = "Gazowa 50/11",
+                  Latitude = 51.078977M,
+                  Longitude = 17.066367M,
+              },
+              new Adress
+              {
+                  AdressId = 14,
+                  Name = "Edwarda Dembowskiego 13/4",
+                  Latitude = 51.106747M,
+                  Longitude = 17.086136M,
+              },
+              new Adress
+              {
+                  AdressId = 15,
+                  Name = "Lekarska 44/12",
+                  Latitude = 51.158208M,
+                  Longitude = 17.032974M,
+              },
+              new Adress
+              {
+                  AdressId = 16,
+                  Name = "Raclawicka 61/3",
+                  Latitude = 51.080764M,
+                  Longitude = 16.997120M, 
+              },
+              new Adress
+              {
+                  AdressId = 17,
+                  Name = "Brzozowa 10a",
+                  Latitude = 51.057948M,
+                  Longitude = 17.058763M,
               }
+
            );
 
 
