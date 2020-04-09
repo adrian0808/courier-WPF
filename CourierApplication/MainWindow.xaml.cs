@@ -40,21 +40,7 @@ namespace CourierApplication
         private IService<Client> clientServices;
         private IService<Order> orderServices;
         private IService<Adress> adressServices;
-        double bufor = 0.0;
-        double p = 0.0;
-        double currentDistance = 0.0;
-        double shortestDistance = 999.0;
-        double currentCmax = 999.0;
-        double deltaDistance = 0.0;
-        int iter = 0;
-
-        List<double> neighbourDistance = new List<double>();
-        List<double> bestDistance = new List<double>();
-        List<KeyValuePair<int, double>[]> kilometersGraphList = new List<KeyValuePair<int, double>[]>();
-        KeyValuePair<int, double>[] kilometersGraph;
-        List<KeyValuePair<int, int>[]> routeGraphList = new List<KeyValuePair<int, int>[]>();
-        KeyValuePair<int, int>[] routeGraph;
-
+        GraphSA graphs;
 
         public MainWindow()
         {
@@ -64,6 +50,7 @@ namespace CourierApplication
             clientServices = new ClientService();
             orderServices = new OrderService();
             adressServices = new AdressService();
+            graphs = new GraphSA();
         }
 
 
@@ -237,7 +224,7 @@ namespace CourierApplication
             }
         }
 
- 
+
         private void UpdateCourierButtonClick(object sender, RoutedEventArgs e)
         {
             Courier courierRow = courierGrid.SelectedItem as Courier;
@@ -312,7 +299,7 @@ namespace CourierApplication
         {
             await Task.Run(() =>
             {
-                /*Loading couriers and orders from text box*/
+                /*Loading couriers and orders from TextBox*/
                 int countOfCouriers = 0;
                 List<Order> orders = new List<Order>();
 
@@ -321,7 +308,7 @@ namespace CourierApplication
                     countOfCouriers = db.Couriers.Where(c => c.isFree == true).Count();
                     if (int.Parse(numOrders.Text) > db.Orders.Where(o => o.isCompleted == false).Count())
                     {
-                        MessageBox.Show("Nie ma tylu zamowien w bazie!\nPrzetworzono wszystkie zamowienia");
+                        MessageBox.Show("Too many orders!\nAll orders in database were processed");
                         orders = db.Orders.Where(o => o.isCompleted == false).Take(db.Orders.Where(o => o.isCompleted == false).Count() - 1).ToList();
                     }
 
@@ -359,125 +346,36 @@ namespace CourierApplication
                 listOfAdressesUnique = listOfAdresses.Distinct().ToList();
 
                 /*Algorithm*/
-
                 double temperature = 0.0;
-                double cooling_temperature = 0.0;
+                double coolingTemperature = 0.0;
                 double lambda = 0.0;
 
                 this.Dispatcher.Invoke((Action)delegate
                 {
                     temperature = Convert.ToDouble(InitTemp.Text);
-                    cooling_temperature = Convert.ToDouble(CoolingTemp.Text);
+                    coolingTemperature = Convert.ToDouble(CoolingTemp.Text);
                     lambda = Convert.ToDouble(Lambda.Text);
                 });
 
 
-                SimulatingAnnealing SA = new SimulatingAnnealing(initialRoute, listOfAdressesUnique, temperature, cooling_temperature, lambda, countOfCouriers);
-                List<int> bestResult = SA.StartSA();
-
+                SimulatingAnnealing SA = new SimulatingAnnealing();
+                SA.StartSA(initialRoute, listOfAdressesUnique, temperature, coolingTemperature, lambda, countOfCouriers);
+                List<int> bestSolution = SA.BestSolution;
+                int iter = SA.Iter;
                 
-                double sumGraphs = 0.0;
-                double sum = 0.0;
-                int countOfRoutes = 1;
-                kilometersGraph = new KeyValuePair<int, double>[bestResult.Count];
-                routeGraph = new KeyValuePair<int, int>[bestResult.Count];
-
-                for (int i = 0; i < size - 1; i++)
-                {
-                    var latitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i] select z.Latitude).First());
-                    var longitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i] select z.Longitude).First());
-                    GeoCoordinate g1 = new GeoCoordinate(latitude1, longitude1);
-
-                    var latitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i + 1] select z.Latitude).First());
-                    var longitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i + 1] select z.Longitude).First());
-                    GeoCoordinate g2 = new GeoCoordinate(latitude2, longitude2);
-
-                    if ((bestResult[i] == 1 && i != 0) || i == size - 2)
-                    {
-                        if (i == size - 2)
-                        {
-                            sumGraphs += g1.GetDistanceTo(g2);
-                            sum += g1.GetDistanceTo(g2);
-                            kilometersGraph[i] = new KeyValuePair<int, double>(countOfRoutes, sumGraphs);
-                            routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes, db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(b => b.AdressId).SingleOrDefault());
-                            countOfRoutes++;
-                        }
-
-                        kilometersGraphList.Add(kilometersGraph);
-                        KeyValuePair<int, double>[] tmpKilometersGraph = new KeyValuePair<int, double>[bestResult.Count];
-                        kilometersGraph = tmpKilometersGraph;
-
-                        routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes + 1, 1);
-                        routeGraphList.Add(routeGraph);
-                        KeyValuePair<int, int>[] tmpRouteGraph = new KeyValuePair<int, int>[bestResult.Count];
-                        routeGraph = tmpRouteGraph;
-
-                        sumGraphs = 0;
-                        countOfRoutes = 1;
-                    }
-
-                    if (i != size - 2)
-                    {
-                        sumGraphs += g1.GetDistanceTo(g2);
-                        sum += g1.GetDistanceTo(g2);
-                        kilometersGraph[i] = new KeyValuePair<int, double>(countOfRoutes, sumGraphs);
-                        routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes, db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(b => b.AdressId).SingleOrDefault());
-                        countOfRoutes++;
-                    }
-                }
-
+                /*Results*/
+                ResultSA results = new ResultSA(bestSolution, iter);
+                results.GenerateResult(listOfAdressesUnique, countOfCouriers);
                
-                int y = 0;
-
-                for (int i = 0; i < countOfCouriers; i++)
-                    bestDistance.Add(0);
-
-                for (int i = 0; i < size - 1; i++)
-                {
-                    var latitude1 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(x => x.Latitude).Single());
-                    var longitude1 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(x => x.Longitude).Single());
-                    GeoCoordinate g1 = new GeoCoordinate(latitude1, longitude1);
-
-                    var latitude2 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i + 1]).Select(x => x.Latitude).Single());
-                    var longitude2 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i + 1]).Select(x => x.Longitude).Single());
-                    GeoCoordinate g2 = new GeoCoordinate(latitude2, longitude2);
-
-                    if (bestResult[i] != 1 || i == 0 || i == size - 1)
-                    {
-                        bufor += g1.GetDistanceTo(g2);
-                    }
-                    else
-                    {
-                        bestDistance[y] = bufor;
-                        bufor = 0.0;
-                        bufor += g1.GetDistanceTo(g2);
-                        y++;
-                    }
-
-                }
-                bestDistance[y] = bufor;
-               
-
-                ResultTSP results = new ResultTSP(bestResult, bestDistance, SA.iter, sum);
-
                 this.Dispatcher.Invoke((Action)delegate
                 {
                     ResultTextBox.Text = results.ToString();
                 });
 
-                this.Dispatcher.Invoke((Action)delegate
-                {
-                    temperature = Convert.ToDouble(InitTemp.Text);
-                    cooling_temperature = Convert.ToDouble(CoolingTemp.Text);
-                    lambda = Convert.ToDouble(Lambda.Text);
-                });
-               
-                bestDistance.Clear();
-                sum = 0.0;
-                sumGraphs = 0.0;
-                p = 0.0;
-                y = 0;
-                bufor = 0.0;
+                /*Graphs*/
+                graphs.GenerateGraphs(bestSolution, listOfAdressesUnique);
+                
+ 
             });
         }
 
@@ -486,9 +384,9 @@ namespace CourierApplication
             var page1 = new Page1();
             this.Dispatcher.Invoke((Action)delegate
             {
-                for (int i = 0; i < kilometersGraphList.Count; i++)
+                for (int i = 0; i < graphs.KilometersGraphList.Count; i++)
                 {
-                    ((LineSeries)page1.GraphsOfKm.Series[i]).ItemsSource = kilometersGraphList[i];
+                    ((LineSeries)page1.GraphsOfKm.Series[i]).ItemsSource = graphs.KilometersGraphList[i];
                 }
             });
             MainGraph.Content = page1;
@@ -499,9 +397,9 @@ namespace CourierApplication
             var page2 = new Page2();
             this.Dispatcher.Invoke((Action)delegate
             {
-                for (int i = 0; i < kilometersGraphList.Count; i++)
+                for (int i = 0; i < graphs.RouteGraphList.Count; i++)
                 {
-                    ((LineSeries)page2.GraphsOfRoute.Series[i]).ItemsSource = routeGraphList[i];
+                    ((LineSeries)page2.GraphsOfRoute.Series[i]).ItemsSource = graphs.RouteGraphList[i];
                 }
             });
             MainGraph.Content = page2;

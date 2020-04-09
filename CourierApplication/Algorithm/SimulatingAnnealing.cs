@@ -9,44 +9,27 @@ using System.Text;
 namespace CourierApplication.Algorithm
 {
     public class SimulatingAnnealing
-    {       
-        public List<int> initialRoute { get; set; }
-        public List<int> currentSolution { get; set; }
-        public List<int> neighbourSolution { get; set; }
-        public List<double> neighbourDistance { get; set; }
-        public List<Adress> listOfAdressesUnique { get; set; }
-        public double currentDistance { get; set; }
-        public double shortestDistance { get; set; }
-        public double currentCmax { get; set; }
-        public double deltaDistance { get; set; }
-        public double lambda { get; set; }
-        public double temperature { get; set; }
-        public double coolingTemperature { get; set; }
-        public int countOfCouriers { get; set; }
-        public int iter { get; set; }
+    {
+        public List<int> BestSolution { get; set; }
+        public int Iter { get; set; }
 
-        public SimulatingAnnealing(List<int> initialRoute, List<Adress> listOfAdressesUnique, double temperature, double coolingTemperature, double lambda, int countOfCouriers)
+        public SimulatingAnnealing()
         {
-            this.initialRoute = initialRoute;
-            currentSolution = new List<int>();
-            neighbourSolution = new List<int>();
-            neighbourDistance = new List<double>();
-            this.listOfAdressesUnique = listOfAdressesUnique;
-            currentDistance = 0.0;
-            shortestDistance = 9999.0;
-            currentCmax = 9999;
-            deltaDistance = 0.0;
-            this.temperature = temperature;
-            this.coolingTemperature = coolingTemperature;
-            this.lambda = lambda;
-            this.countOfCouriers = countOfCouriers;
+            this.BestSolution = new List<int>();
+            this.Iter = 0;
         }
 
-        
 
-        public List<int> StartSA()
+
+        public void StartSA(List<int> initialRoute, List<Adress> listOfAdressesUnique, double temperature, double coolingTemperature, double lambda, int countOfCouriers)
         {
-            List<int> bestResults = new List<int>();
+            List<int> currentSolution = new List<int>();
+            List<int> neighbourSolution = new List<int>();
+            List<double> neighbourDistance = new List<double>();
+            double currentDistance = 0.0;
+            double shortestDistance = 9999.0;
+            double currentCmax = 9999;
+            double deltaDistance = 0.0;
 
             for (int i = 0; i < initialRoute.Count(); i++)
             {
@@ -68,9 +51,9 @@ namespace CourierApplication.Algorithm
                 currentDistance += g1.GetDistanceTo(g2);
             }
 
-           
+
             for (int i = 0; i < currentSolution.Count; i++)
-                bestResults.Add(currentSolution[i]);
+                BestSolution.Add(currentSolution[i]);
 
             shortestDistance = currentDistance;
 
@@ -89,7 +72,7 @@ namespace CourierApplication.Algorithm
                 for (int i = 0; i < currentSolution.Count(); i++)
                     neighbourSolution.Add(currentSolution[i]);
 
-                            
+
                 int temp = neighbourSolution[randomNumber1];
                 neighbourSolution[randomNumber1] = neighbourSolution[randomNumber2];
                 neighbourSolution[randomNumber2] = temp;
@@ -135,9 +118,9 @@ namespace CourierApplication.Algorithm
                 if (shortestDistance > currentCmax)
                 {
                     shortestDistance = currentCmax;
-                    bestResults.Clear();
+                    BestSolution.Clear();
                     for (int i = 0; i < size; i++)
-                        bestResults.Add(neighbourSolution[i]);
+                        BestSolution.Add(neighbourSolution[i]);
                 }
 
                 if (currentCmax <= currentDistance)
@@ -170,10 +153,8 @@ namespace CourierApplication.Algorithm
                 neighbourDistance.Clear();
                 temperature *= lambda;
                 bufor = 0.0;
-                iter++;
-
-            } 
-            return bestResults;
+                Iter++;
+            }
         }
     }
 }
