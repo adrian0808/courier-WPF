@@ -26,6 +26,7 @@ using System.Windows.Controls.DataVisualization;
 using System.Windows.Controls.Primitives;
 using System.Windows.Controls.DataVisualization.Charting;
 using System.Threading;
+using CourierApplication.Algorithm;
 
 namespace CourierApplication
 {
@@ -34,14 +35,19 @@ namespace CourierApplication
     /// </summary>
     public partial class MainWindow : Window
     {
-        private CourierDbContext db = new CourierDbContext();
-        double currentDistance = 0.0;
-        double delta_distance = 0.0;
-        double shortestDistance = 9999.0;
+        private CourierDbContext db;
+        private IService<Courier> courierServices;
+        private IService<Client> clientServices;
+        private IService<Order> orderServices;
+        private IService<Adress> adressServices;
         double bufor = 0.0;
-        double currentCmax = 999.0;
         double p = 0.0;
+        double currentDistance = 0.0;
+        double shortestDistance = 999.0;
+        double currentCmax = 999.0;
+        double deltaDistance = 0.0;
         int iter = 0;
+
         List<double> neighbourDistance = new List<double>();
         List<double> bestDistance = new List<double>();
         List<KeyValuePair<int, double>[]> kilometersGraphList = new List<KeyValuePair<int, double>[]>();
@@ -49,9 +55,15 @@ namespace CourierApplication
         List<KeyValuePair<int, int>[]> routeGraphList = new List<KeyValuePair<int, int>[]>();
         KeyValuePair<int, int>[] routeGraph;
 
+
         public MainWindow()
         {
             InitializeComponent();
+            db = new CourierDbContext();
+            courierServices = new CourierService();
+            clientServices = new ClientService();
+            orderServices = new OrderService();
+            adressServices = new AdressService();
         }
 
 
@@ -62,211 +74,80 @@ namespace CourierApplication
             listTmp[b] = temp;
         }
 
-        private void LoadCourierButton_Click(object sender, RoutedEventArgs e)
+        private void RefreshCourierDataGridView()
+        {
+            courierGrid.ItemsSource = courierServices.LoadData();
+        }
+        private void RefreshClientDataGridView()
+        {
+            clientGrid.ItemsSource = clientServices.LoadData();
+        }
+        private void RefreshOrderDataGridView()
+        {
+            orderGrid.ItemsSource = orderServices.LoadData();
+        }
+        private void RefreshAdressDataGridView()
+        {
+            adressGrid.ItemsSource = adressServices.LoadData();
+        }
+
+        private void LoadCourierButtonClick(object sender, RoutedEventArgs e)
         {
             if ((LoadCourierButton.Content as string) == "Load Couriers")
             {
-                LoadCourierData();
+                courierGrid.ItemsSource = courierServices.LoadData();
+                LoadCourierButton.Content = "Unload Couriers";
             }
             else
             {
-                UnloadCourierData();
+                courierGrid.ItemsSource = null;
+                LoadCourierButton.Content = "Load Couriers";
             }
-
         }
 
-        private void LoadClientButton_Click(object sender, RoutedEventArgs e)
+        private void LoadClientButtonClick(object sender, RoutedEventArgs e)
         {
             if ((LoadClientButton.Content as string) == "Load Clients")
             {
-                LoadClientData();
+                clientGrid.ItemsSource = clientServices.LoadData();
+                LoadClientButton.Content = "Unload Clients";
             }
             else
             {
-                UnloadClientData();
+                clientGrid.ItemsSource = null;
+                LoadClientButton.Content = "Load Clients";
             }
         }
 
-        private void LoadOrderButton_Click(object sender, RoutedEventArgs e)
+        private void LoadOrderButtonClick(object sender, RoutedEventArgs e)
         {
             if ((LoadOrderButton.Content as string) == "Load Orders")
             {
-                LoadOrderData();
+                orderGrid.ItemsSource = orderServices.LoadData();
+                LoadOrderButton.Content = "Unload Orders";
             }
             else
             {
-                UnloadOrderData();
+                orderGrid.ItemsSource = null;
+                LoadOrderButton.Content = "Load Orders";
             }
         }
 
-        private void LoadAdressButton_Click(object sender, RoutedEventArgs e)
+        private void LoadAdressButtonClick(object sender, RoutedEventArgs e)
         {
             if ((LoadAdressButton.Content as string) == "Load Adresses")
             {
-                LoadAdressData();
+                adressGrid.ItemsSource = adressServices.LoadData();
+                LoadAdressButton.Content = "Unload Adresses";
             }
             else
             {
-                UnloadAdressData();
+                adressGrid.ItemsSource = null;
+                LoadAdressButton.Content = "Load Adresses";
             }
         }
 
-        private void AddCourierButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddCourierData();
-        }
-        private void AddClientButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddClientData();
-        }
-        private void AddOrderButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddOrderData();
-        }
-
-        private void AddAdressButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddAdressData();
-        }
-
-        private void LoadCourierData()
-        {
-            var couriers = db.Couriers.ToList();
-            courierGrid.ItemsSource = couriers;
-            LoadCourierButton.Content = "Unload Couriers";
-        }
-
-        private void UnloadCourierData()
-        {
-            courierGrid.ItemsSource = null;
-            LoadCourierButton.Content = "Load Couriers";
-        }
-
-        private void LoadClientData()
-        {
-            var clients = db.Clients.ToList();
-            clientGrid.ItemsSource = clients; ;
-            LoadClientButton.Content = "Unload Clients";
-        }
-
-        private void UnloadClientData()
-        {
-            clientGrid.ItemsSource = null;
-            LoadClientButton.Content = "Load Clients";
-        }
-
-        private void LoadOrderData()
-        {
-            var orders = db.Orders.ToList();
-            orderGrid.ItemsSource = orders;
-            LoadOrderButton.Content = "Unload Orders";
-        }
-
-        private void UnloadOrderData()
-        {
-            orderGrid.ItemsSource = null;
-            LoadOrderButton.Content = "Load Orders";
-        }
-
-        private void LoadAdressData()
-        {
-            var adresses = db.Adresses.ToList();
-            adressGrid.ItemsSource = adresses;
-            LoadAdressButton.Content = "Unload Adresses";
-        }
-
-        private void UnloadAdressData()
-        {
-            adressGrid.ItemsSource = null;
-            LoadAdressButton.Content = "Load Adresses";
-        }
-
-        private void UpdateCourierButton(object sender, RoutedEventArgs e)
-        {
-            Courier courierRow = courierGrid.SelectedItem as Courier;
-            Courier courier = db.Couriers.Where(c => c.CourierId == courierRow.CourierId).Single();
-            courier.FirstName = courierRow.FirstName;
-            courier.LastName = courierRow.LastName;
-            courier.isFree = courierRow.isFree;
-            db.SaveChanges();
-            MessageBox.Show("Row was updated successfully");
-            LoadCourierData();
-        }
-
-        private void UpdateClientButton(object sender, RoutedEventArgs e)
-        {
-            Client clientRow = clientGrid.SelectedItem as Client;
-            Client client = db.Clients.Where(c => c.ClientId == clientRow.ClientId).Single();
-            client.AdressId = clientRow.AdressId;
-            db.SaveChanges();
-            MessageBox.Show("Row was updated successfully");
-            LoadClientData();
-        }
-
-        private void UpdateOrderButton(object sender, RoutedEventArgs e)
-        {
-            Order orderRow = orderGrid.SelectedItem as Order;
-            Order order = db.Orders.Where(o => o.OrderId == orderRow.OrderId).Single();
-            order.AdressId = orderRow.AdressId;
-            order.isCompleted = orderRow.isCompleted;
-            db.SaveChanges();
-            MessageBox.Show("Row was updated successfully");
-            LoadOrderData();
-        }
-
-        private void UpdateAdressButton(object sender, RoutedEventArgs e)
-        {
-            Adress adressRow = adressGrid.SelectedItem as Adress;
-            Adress adress = db.Adresses.Where(a => a.AdressId == adressRow.AdressId).Single();
-            adress.Name = adressRow.Name;
-            adress.Latitude = adressRow.Latitude;
-            adress.Longitude = adressRow.Longitude;
-            db.SaveChanges();
-            MessageBox.Show("Row was updated successfully");
-            LoadAdressData();
-        }
-
-        private void DeleteCourierButton(object sender, RoutedEventArgs e)
-        {
-            Courier courierRow = courierGrid.SelectedItem as Courier;
-            Courier courier = db.Couriers.Where(c => c.CourierId == courierRow.CourierId).Single();
-            db.Remove(courier);
-            db.SaveChanges();
-            MessageBox.Show("Row was deleted successfully");
-            LoadCourierData();
-        }
-
-        private void DeleteClientButton(object sender, RoutedEventArgs e)
-        {
-            Client clientRow = clientGrid.SelectedItem as Client;
-            Client client = db.Clients.Where(c => c.ClientId == clientRow.ClientId).Single();
-            db.Remove(client);
-            db.SaveChanges();
-            MessageBox.Show("Row was deleted successfully");
-            LoadClientData();
-        }
-
-        private void DeleteOrderButton(object sender, RoutedEventArgs e)
-        {
-            Order orderRow = orderGrid.SelectedItem as Order;
-            Order order = db.Orders.Where(o => o.OrderId == orderRow.OrderId).Single();
-            db.Remove(order);
-            db.SaveChanges();
-            MessageBox.Show("Row was deleted successfully");
-            LoadOrderData();
-        }
-
-        private void DeleteAdressButton(object sender, RoutedEventArgs e)
-        {
-            Adress adressRow = adressGrid.SelectedItem as Adress;
-            Adress adress = db.Adresses.Where(a => a.AdressId == adressRow.AdressId).Single();
-            db.Remove(adress);
-            db.SaveChanges();
-            MessageBox.Show("Row was deleted successfully");
-            LoadAdressData();
-        }
-
-        private void AddCourierData()
+        private void AddCourierButtonClick(object sender, RoutedEventArgs e)
         {
             string firstname = FirstNameCourier.Text;
             string lastname = LastNameCourier.Text;
@@ -277,18 +158,16 @@ namespace CourierApplication
             if (isFirstnameValid == true && isLastnameValid == true)
             {
                 Courier courier = new Courier() { FirstName = firstname, LastName = lastname, isFree = false };
-                db.Add(courier);
-                db.SaveChanges();
+                courierServices.AddData(courier);
                 MessageBox.Show("Row was inserted successfully");
-                LoadCourierData();
+                RefreshCourierDataGridView();
             }
             else
             {
                 MessageBox.Show("Invalid data!");
             }
         }
-
-        private void AddClientData()
+        private void AddClientButtonClick(object sender, RoutedEventArgs e)
         {
             string adressId = AdressIdClient.Text;
             bool isAdressValid = adressId.All(Char.IsDigit);
@@ -298,10 +177,9 @@ namespace CourierApplication
                 if (isAdressExist != null)
                 {
                     Client client = new Client() { AdressId = int.Parse(adressId) };
-                    db.Add(client);
-                    db.SaveChanges();
+                    clientServices.AddData(client);
                     MessageBox.Show("Row was inserted successfully");
-                    LoadClientData();
+                    RefreshClientDataGridView();
                 }
                 else
                 {
@@ -312,23 +190,20 @@ namespace CourierApplication
             {
                 MessageBox.Show("Invalid data!");
             }
-
         }
-
-        private void AddOrderData()
+        private void AddOrderButtonClick(object sender, RoutedEventArgs e)
         {
             string adressId = AdressIdOrder.Text;
             bool isAdressValid = adressId.All(Char.IsDigit);
             if (isAdressValid == true)
             {
-                var isAdressExist = db.Orders.Where(a => a.AdressId == int.Parse(adressId)).SingleOrDefault();
+                var isAdressExist = db.Adresses.Where(a => a.AdressId == int.Parse(adressId)).SingleOrDefault();
                 if (isAdressExist != null)
                 {
                     Order order = new Order() { AdressId = int.Parse(adressId) };
-                    db.Add(order);
-                    db.SaveChanges();
+                    orderServices.AddData(order);
                     MessageBox.Show("Row was inserted successfully");
-                    LoadOrderData();
+                    RefreshOrderDataGridView();
                 }
                 else
                 {
@@ -341,7 +216,7 @@ namespace CourierApplication
             }
         }
 
-        private void AddAdressData()
+        private void AddAdressButtonClick(object sender, RoutedEventArgs e)
         {
             string name = NameAdress.Text;
             string latitude = LatitudeAdress.Text;
@@ -351,12 +226,10 @@ namespace CourierApplication
 
             if (decimal.TryParse(latitude, out latitudeDec) && decimal.TryParse(longitude, out longitudeDec))
             {
-
                 Adress adress = new Adress() { Name = name, Latitude = latitudeDec, Longitude = longitudeDec };
-                db.Adresses.Add(adress);
-                db.SaveChanges();
+                adressServices.AddData(adress);
                 MessageBox.Show("Row was inserted successfully");
-                LoadAdressData();
+                RefreshAdressDataGridView();
             }
             else
             {
@@ -364,6 +237,70 @@ namespace CourierApplication
             }
         }
 
+ 
+        private void UpdateCourierButtonClick(object sender, RoutedEventArgs e)
+        {
+            Courier courierRow = courierGrid.SelectedItem as Courier;
+            courierServices.UpdateData(courierRow);
+            MessageBox.Show("Row was updated successfully");
+            RefreshOrderDataGridView();
+        }
+
+        private void UpdateClientButtonClick(object sender, RoutedEventArgs e)
+        {
+            Client clientRow = clientGrid.SelectedItem as Client;
+            clientServices.UpdateData(clientRow);
+            MessageBox.Show("Row was updated successfully");
+            RefreshClientDataGridView();
+        }
+
+        private void UpdateOrderButtonClick(object sender, RoutedEventArgs e)
+        {
+            Order orderRow = orderGrid.SelectedItem as Order;
+            orderServices.UpdateData(orderRow);
+            MessageBox.Show("Row was updated successfully");
+            RefreshOrderDataGridView();
+        }
+
+        private void UpdateAdressButtonClick(object sender, RoutedEventArgs e)
+        {
+            Adress adressRow = adressGrid.SelectedItem as Adress;
+            adressServices.UpdateData(adressRow);
+            MessageBox.Show("Row was updated successfully");
+            RefreshAdressDataGridView();
+        }
+
+        private void DeleteCourierButtonClick(object sender, RoutedEventArgs e)
+        {
+            Courier courierRow = courierGrid.SelectedItem as Courier;
+            courierServices.DeleteData(courierRow);
+            MessageBox.Show("Row was deleted successfully");
+            RefreshCourierDataGridView();
+        }
+
+        private void DeleteClientButtonClick(object sender, RoutedEventArgs e)
+        {
+            Client clientRow = clientGrid.SelectedItem as Client;
+            clientServices.DeleteData(clientRow);
+            MessageBox.Show("Row was deleted successfully");
+            RefreshClientDataGridView();
+        }
+
+        private void DeleteOrderButtonClick(object sender, RoutedEventArgs e)
+        {
+            Order orderRow = orderGrid.SelectedItem as Order;
+            orderServices.DeleteData(orderRow);
+            MessageBox.Show("Row was deleted successfully");
+            RefreshOrderDataGridView();
+        }
+
+        private void DeleteAdressButtonClick(object sender, RoutedEventArgs e)
+        {
+            Adress adressRow = adressGrid.SelectedItem as Adress;
+            adressServices.DeleteData(adressRow);
+            MessageBox.Show("Row was deleted successfully");
+            RefreshAdressDataGridView();
+        }
 
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -375,6 +312,7 @@ namespace CourierApplication
         {
             await Task.Run(() =>
             {
+                /*Loading couriers and orders from text box*/
                 int countOfCouriers = 0;
                 List<Order> orders = new List<Order>();
 
@@ -391,13 +329,11 @@ namespace CourierApplication
                         orders = db.Orders.Where(o => o.isCompleted == false).Take(int.Parse(numOrders.Text)).ToList();
                 });
 
-
-
+                /*Creating initial route based on orders*/
                 int countOfRoute = orders.Count() + countOfCouriers + 1;
-
                 List<int> initialRoute = new List<int>();
                 List<Adress> listOfAdresses = new List<Adress>();
-
+                List<Adress> listOfAdressesUnique = new List<Adress>();
 
                 for (int i = 0; i < countOfRoute; i++)
                 {
@@ -419,12 +355,10 @@ namespace CourierApplication
 
                 }
 
-                var listOfAdressesUnique = listOfAdresses.Distinct().ToList();
+                int size = initialRoute.Count;
+                listOfAdressesUnique = listOfAdresses.Distinct().ToList();
 
                 /*Algorithm*/
-
-                List<int> currentSolution = new List<int>();
-                List<int> neighbourSolution = new List<int>();
 
                 double temperature = 0.0;
                 double cooling_temperature = 0.0;
@@ -438,182 +372,61 @@ namespace CourierApplication
                 });
 
 
+                SimulatingAnnealing SA = new SimulatingAnnealing(initialRoute, listOfAdressesUnique, temperature, cooling_temperature, lambda, countOfCouriers);
+                List<int> bestResult = SA.StartSA();
 
-
-                for (int i = 0; i < initialRoute.Count(); i++)
-                {
-                    currentSolution.Add(initialRoute[i]);
-                }
-
-
-                int size = currentSolution.Count();
-
-                for (int i = 0; i < currentSolution.Count - 1; i++)
-                {
-                    var latitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == currentSolution[i] select z.Latitude).First());
-                    var longitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == currentSolution[i] select z.Longitude).First());
-                    GeoCoordinate g1 = new GeoCoordinate(latitude1, longitude1);
-
-                    var latitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == currentSolution[i + 1] select z.Latitude).First());
-                    var longitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == currentSolution[i + 1] select z.Longitude).First());
-                    GeoCoordinate g2 = new GeoCoordinate(latitude2, longitude2);
-
-                    currentDistance += g1.GetDistanceTo(g2);
-                }
-
-                List<int> bestSolution = new List<int>();
-                for (int i = 0; i < currentSolution.Count; i++)
-                    bestSolution.Add(currentSolution[i]);
-
-                shortestDistance = currentDistance;
-
-                Random random = new Random();
-                Random random2 = new Random();
-
-                while (temperature > cooling_temperature)
-                {
-
-                    int randomNumber1 = random.Next(1, size - 1);
-                    int randomNumber2 = random2.Next(1, size - 1);
-
-                    while (randomNumber1 == randomNumber2)
-                        randomNumber2 = random.Next(1, size - 1);
-
-                    for (int i = 0; i < currentSolution.Count(); i++)
-                        neighbourSolution.Add(currentSolution[i]);
-
-                    Swap(ref neighbourSolution, ref randomNumber1, ref randomNumber2);
-
-                    int u = 0;
-
-                    for (int i = 0; i < countOfCouriers; i++)
-                        neighbourDistance.Add(0);
-
-                    for (int i = 0; i < size - 1; i++)
-                    {
-                        var latitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == neighbourSolution[i] select z.Latitude).First());
-                        var longitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == neighbourSolution[i] select z.Longitude).First());
-                        GeoCoordinate g1 = new GeoCoordinate(latitude1, longitude1);
-
-                        var latitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == neighbourSolution[i + 1] select z.Latitude).First());
-                        var longitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == neighbourSolution[i + 1] select z.Longitude).First());
-                        GeoCoordinate g2 = new GeoCoordinate(latitude2, longitude2);
-
-                        if (neighbourSolution[i] != 1 || i == 0 || i == size - 1)
-                            bufor += g1.GetDistanceTo(g2);
-                        else
-                        {
-                            neighbourDistance[u] = bufor;
-                            bufor = 0.0;
-                            bufor += g1.GetDistanceTo(g2);
-                            u++;
-                        }
-
-                    }
-
-                    neighbourDistance[u] = bufor;
-                    u = 0;
-                    bufor = 0;
-
-                    neighbourDistance.Sort();
-                    bufor = neighbourDistance.Last();
-
-                    if (bufor < currentCmax)
-                        currentCmax = bufor;
-
-                    if (shortestDistance > currentCmax)
-                    {
-                        shortestDistance = currentCmax;
-                        bestSolution.Clear();
-                        for (int i = 0; i < size; i++)
-                            bestSolution.Add(neighbourSolution[i]);
-                    }
-
-                    if (currentCmax <= currentDistance)
-                    {
-                        currentDistance = currentCmax;
-                        currentSolution.Clear();
-                        for (int i = 0; i < size; i++)
-                            currentSolution.Add(neighbourSolution[i]);
-
-                    }
-                    else
-                    {
-                        delta_distance = currentCmax - currentDistance;
-                        p = Math.Exp((-delta_distance) / temperature);
-                        Random random3 = new Random();
-                        double z = random3.Next(0, 101);
-                        z = z / 100;
-
-                        if (z <= p)
-                        {
-                            currentSolution.Clear();
-                            for (int i = 0; i < size; i++)
-                                currentSolution.Add(neighbourSolution[i]);
-                            currentDistance = currentCmax;
-                        }
-
-                    }
-
-
-
-                    neighbourSolution.Clear();
-                    neighbourDistance.Clear();
-                    temperature *= lambda;
-                    bufor = 0.0;
-                    iter++;
-
-                }
-
+                
                 double sumGraphs = 0.0;
                 double sum = 0.0;
                 int countOfRoutes = 1;
-                kilometersGraph = new KeyValuePair<int, double>[bestSolution.Count];
-                routeGraph = new KeyValuePair<int, int>[bestSolution.Count];
+                kilometersGraph = new KeyValuePair<int, double>[bestResult.Count];
+                routeGraph = new KeyValuePair<int, int>[bestResult.Count];
 
                 for (int i = 0; i < size - 1; i++)
-                {                
-                    var latitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestSolution[i] select z.Latitude).First());
-                    var longitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestSolution[i] select z.Longitude).First());
+                {
+                    var latitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i] select z.Latitude).First());
+                    var longitude1 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i] select z.Longitude).First());
                     GeoCoordinate g1 = new GeoCoordinate(latitude1, longitude1);
 
-                    var latitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestSolution[i + 1] select z.Latitude).First());
-                    var longitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestSolution[i + 1] select z.Longitude).First());
+                    var latitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i + 1] select z.Latitude).First());
+                    var longitude2 = Decimal.ToDouble((from z in listOfAdressesUnique where z.AdressId == bestResult[i + 1] select z.Longitude).First());
                     GeoCoordinate g2 = new GeoCoordinate(latitude2, longitude2);
 
-                    if ((bestSolution[i] == 1 && i != 0) || i == size - 2)
+                    if ((bestResult[i] == 1 && i != 0) || i == size - 2)
                     {
-                        if(i == size -2)
+                        if (i == size - 2)
                         {
                             sumGraphs += g1.GetDistanceTo(g2);
                             sum += g1.GetDistanceTo(g2);
                             kilometersGraph[i] = new KeyValuePair<int, double>(countOfRoutes, sumGraphs);
-                            routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes, db.Adresses.Where(a => a.AdressId == bestSolution[i]).Select(b => b.AdressId).SingleOrDefault());
+                            routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes, db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(b => b.AdressId).SingleOrDefault());
                             countOfRoutes++;
                         }
-                        
+
                         kilometersGraphList.Add(kilometersGraph);
-                        KeyValuePair<int, double>[] tmpKilometersGraph = new KeyValuePair<int, double>[bestSolution.Count];
+                        KeyValuePair<int, double>[] tmpKilometersGraph = new KeyValuePair<int, double>[bestResult.Count];
                         kilometersGraph = tmpKilometersGraph;
 
                         routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes + 1, 1);
                         routeGraphList.Add(routeGraph);
-                        KeyValuePair<int, int>[] tmpRouteGraph = new KeyValuePair<int, int>[bestSolution.Count];
+                        KeyValuePair<int, int>[] tmpRouteGraph = new KeyValuePair<int, int>[bestResult.Count];
                         routeGraph = tmpRouteGraph;
 
                         sumGraphs = 0;
                         countOfRoutes = 1;
                     }
 
-                    sumGraphs += g1.GetDistanceTo(g2);
-                    sum += g1.GetDistanceTo(g2);
-                    kilometersGraph[i] = new KeyValuePair<int, double>(countOfRoutes, sumGraphs);
-                    routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes, db.Adresses.Where(a => a.AdressId == bestSolution[i]).Select(b => b.AdressId).SingleOrDefault());
-                    countOfRoutes++;
+                    if (i != size - 2)
+                    {
+                        sumGraphs += g1.GetDistanceTo(g2);
+                        sum += g1.GetDistanceTo(g2);
+                        kilometersGraph[i] = new KeyValuePair<int, double>(countOfRoutes, sumGraphs);
+                        routeGraph[i] = new KeyValuePair<int, int>(countOfRoutes, db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(b => b.AdressId).SingleOrDefault());
+                        countOfRoutes++;
+                    }
                 }
 
                
-
                 int y = 0;
 
                 for (int i = 0; i < countOfCouriers; i++)
@@ -621,15 +434,15 @@ namespace CourierApplication
 
                 for (int i = 0; i < size - 1; i++)
                 {
-                    var latitude1 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestSolution[i]).Select(x => x.Latitude).Single());
-                    var longitude1 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestSolution[i]).Select(x => x.Longitude).Single());
+                    var latitude1 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(x => x.Latitude).Single());
+                    var longitude1 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i]).Select(x => x.Longitude).Single());
                     GeoCoordinate g1 = new GeoCoordinate(latitude1, longitude1);
 
-                    var latitude2 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestSolution[i + 1]).Select(x => x.Latitude).Single());
-                    var longitude2 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestSolution[i + 1]).Select(x => x.Longitude).Single());
+                    var latitude2 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i + 1]).Select(x => x.Latitude).Single());
+                    var longitude2 = Decimal.ToDouble(db.Adresses.Where(a => a.AdressId == bestResult[i + 1]).Select(x => x.Longitude).Single());
                     GeoCoordinate g2 = new GeoCoordinate(latitude2, longitude2);
 
-                    if (bestSolution[i] != 1 || i == 0 || i == size - 1)
+                    if (bestResult[i] != 1 || i == 0 || i == size - 1)
                     {
                         bufor += g1.GetDistanceTo(g2);
                     }
@@ -643,32 +456,28 @@ namespace CourierApplication
 
                 }
                 bestDistance[y] = bufor;
-                y = 0;
+               
 
-                ResultTSP results = new ResultTSP(bestSolution, bestDistance, iter, sum);
+                ResultTSP results = new ResultTSP(bestResult, bestDistance, SA.iter, sum);
 
                 this.Dispatcher.Invoke((Action)delegate
                 {
                     ResultTextBox.Text = results.ToString();
                 });
 
-
-                delta_distance = 0.0;
-                currentDistance = 0.0;
-                shortestDistance = 999.0;
-                currentCmax = 999.0;
-                p = 0.0;
-                iter = 0;
                 this.Dispatcher.Invoke((Action)delegate
                 {
                     temperature = Convert.ToDouble(InitTemp.Text);
                     cooling_temperature = Convert.ToDouble(CoolingTemp.Text);
                     lambda = Convert.ToDouble(Lambda.Text);
                 });
-                currentSolution.Clear();
+               
                 bestDistance.Clear();
                 sum = 0.0;
                 sumGraphs = 0.0;
+                p = 0.0;
+                y = 0;
+                bufor = 0.0;
             });
         }
 

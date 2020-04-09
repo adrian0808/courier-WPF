@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CourierApplication.DAL
 {
-    class CourierDbContext : DbContext
+    public class CourierDbContext : DbContext
     {
         //CourierDbContext() { }
 
@@ -27,9 +27,6 @@ namespace CourierApplication.DAL
         {
             modelBuilder.Seed();
         }
-
-
-
 
     }
 }

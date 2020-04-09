@@ -7,7 +7,7 @@ using System.Text;
 namespace CourierApplication.Model
 {
     [Table("Clients")]
-    public class Client
+    public class Client 
     {
         [Key]
         public int ClientId { get; set; }
