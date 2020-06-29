@@ -19,23 +19,23 @@ Transport cost optimization system in a courier company. Desktop application tha
 * SQL Server
 
 ## Screenshots
-* Parameters
+
 ![Parameters](./imgReadmeCourier/parameters.png)
-* Result
+
 ![Result](./imgReadmeCourier/result.png)
-* Graph of kilometers traveled depending on the current route
+
 ![Graph1](./imgReadmeCourier/graph1.png)
-* Graph showing the order of visited adresses
+
 ![Graph2](./imgReadmeCourier/graph2.png)
-* Couriers
+
 ![Couriers](./imgReadmeCourier/couriers.png)
-* Clients
+
 ![Clients](./imgReadmeCourier/clients.png)
-* Orders
+
 ![Orders](./imgReadmeCourier/orders.png)
-* Adress
+
 ![Adress](./imgReadmeCourier/adress.png)
-* Adding new couriers/clients/orders/adress
+
 ![Adding](./imgReadmeCourier/adding.png)
 
 ## Features
